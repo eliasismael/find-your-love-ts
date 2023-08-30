@@ -1,188 +1,223 @@
+// Hooks
 import { useContext, useState, useRef } from "react";
+// import useLocalStorage from "../../hooks/useLocalStorage";
+
+// Context
 import { IUsersContext, UsersContext } from "../../context/users";
-import Modal from "../Modal/Modal";
-import { IUser } from "../../models/user-model";
+
+// import Modal from "../Modal/Modal";
+
+// Models
+import { IUser } from "../../models/user";
+
+// Styles
+const styles = {
+  divLabelInput: "w-4/5 flex flex-col justify-center items-center mb-2",
+  form: "relative flex flex-col items-center text-md p-2 w-full",
+  Modal:
+    "w-screen h-screen fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center z-50",
+  ModalOpacityLayer: "bg-black opacity-50 absolute w-full h-full",
+  ModalContent:
+    "rounded-lg bg-gradient-to-br from-primary to-secondary shadow-sm shadow-white p-2 w-3/5 flex flex-col justify-center items-center gap-4 relative sm:w-3/5 md:w-2/5 lg:w-3/12",
+  label: "text-white text-xl mb-1",
+  span: "text-gray-500 text-sm relative left-24 bottom-8 text-bold",
+  divButtons: "h-20 w-full flex justify-around flex-col items-center",
+  button:
+    "bg-white text-black rounded-md cursor-pointer duration-300 ease-out h-7 w-1/2 text-lg hover:shadow-white shadow-sm",
+};
 
 function ButtonAddUser(): JSX.Element {
-    const { men, women, setMen, setWomen } = useContext(
-        UsersContext
-    ) as IUsersContext;
+  const { men, women, setMen, setWomen } = useContext(
+    UsersContext
+  ) as IUsersContext;
 
-    const [addingUser, setAddingUser] = useState(false);
+  const [isAddingUser, setAddingUser] = useState(false);
 
-    const nameRef = useRef<HTMLInputElement | null>(null);
-    const imgRef = useRef<HTMLInputElement | null>(null);
-    const genderRef = useRef<HTMLSelectElement | null>(null);
-    const presentationRef = useRef<HTMLTextAreaElement | null>(null);
+  // const [usersStores, setUsersStored] = useLocalStorage("STORED_USERS");
 
-    const [typedCharacters, setTypedCharacters] = useState(0);
-    const PRESENTATION_MAX_LENGTH = 500;
+  // const [newMen, setNewMen] = useState("");
+  // const [newWomen, setNewWomen] = useState("");
 
-    const onClickHandle = () => setAddingUser((prevState) => !prevState);
+  // const setLocalStorage = (user: IUser) => {
+  //   try {
+  //     // const user: IUser = JSON.parse(user);
 
-    const addPerson = () => {
-        if (
-            imgRef.current &&
-            imgRef.current.files &&
-            nameRef.current &&
-            nameRef.current.value &&
-            presentationRef.current &&
-            genderRef.current
-        ) {
-            // RETURN CONDITIONS
-            if (!imgRef.current.files[0]) {
-                return alert("Añade una imágen");
-            }
-            if (!nameRef.current.value) {
-                return alert("Añade un nombre");
-            }
-            if (
-                Array.from(nameRef.current.value).every((char) => char === " ")
-            ) {
-                return alert("Añade un nombre válido");
-            }
-            if (
-                men.some(
-                    (element) => element.name === String(nameRef.current?.value)
-                ) ||
-                women.some(
-                    (element) => element.name === String(nameRef.current?.value)
-                )
-            ) {
-                return alert("Esa persona ya fue añadida");
-            }
+  //     const strUser = JSON.stringify(user);
 
-            // PROCESS THE DATA
-            const file: File = imgRef.current.files[0];
-            const reader: FileReader = new FileReader();
-            reader.readAsDataURL(file);
+  //     if (user.gender === "MALE") {
+  //       const MEN_STORED = window.localStorage.getItem("MEN_STORED") || "";
+  //       const parsedMenStored = JSON.parse(MEN_STORED);
+  //       console.log(parsedMenStored);
+  //       // window.localStorage.setItem("MEN_STORED", () => strUser);
+  //     }
 
-            reader.addEventListener("load", () => {
-                const newUser: IUser = {
-                    name: nameRef.current?.value as string,
-                    img: reader.result as string,
-                    gender:
-                        genderRef.current?.value === "Masculino"
-                            ? "MALE"
-                            : "FEMALE",
-                    presentation: presentationRef.current?.value as string,
-                };
+  //     if (user.gender === "FEMALE") {
+  //       window.localStorage.setItem("WOMEN_STORED", strUser);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-                if (newUser.gender === "MALE") {
-                    setMen((currentValue) => [...currentValue, newUser]);
-                } else if (newUser.gender === "FEMALE") {
-                    setWomen((currentValue) => [...currentValue, newUser]);
-                }
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const imgRef = useRef<HTMLInputElement | null>(null);
+  const genderRef = useRef<HTMLSelectElement | null>(null);
+  const presentationRef = useRef<HTMLTextAreaElement | null>(null);
 
-                setAddingUser(false);
-            });
-        }
-    };
+  const [typedCharacters, setTypedCharacters] = useState(0);
+  const PRESENTATION_MAX_LENGTH = 500;
 
-    return (
-        <>
-            <div
-                onClick={onClickHandle}
-                className="flex justify-center items-center align-text-top text-white text-lg w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary color-white fixed bottom-4 right-4 hover:scale-110 hover:shadow-white shadow-sm cursor-pointer ease-out duration-300">
-                Add user
-            </div>
+  const onClickHandle = () => setAddingUser((prevState) => !prevState);
 
-            {addingUser && (
-                <Modal>
-                    <div className="w-screen h-screen fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center">
-                        {/* Capa de opacidad */}
-                        <div
-                            onClick={onClickHandle}
-                            className="bg-black opacity-50 absolute w-full h-full"></div>
-                        <div
-                            style={{ width: "calc(100vw - 70%)" }}
-                            className="rounded-lg bg-gradient-to-br from-primary to-secondary shadow-sm shadow-white py-10 px-10 flex flex-col justify-center items-center gap-4 relative">
-                            <form className="relative flex flex-col items-start text-md p-2">
-                                <label htmlFor="name" className="text-white">
-                                    Nombre:
-                                </label>
+  const addPerson = () => {
+    const file = imgRef.current?.files?.[0];
+    if (!file) return alert("Añade una imagen");
 
-                                <input
-                                    type="text"
-                                    ref={nameRef}
-                                    placeholder="Nombre de la persona"
-                                />
+    const name = nameRef.current?.value?.trim();
+    if (!name) return alert("Añade un nombre");
+    if (name === "") return alert("Añade un nombre válido");
 
-                                <label
-                                    htmlFor="user-img"
-                                    className="text-white">
-                                    Imágen:
-                                </label>
-                                <input
-                                    type="file"
-                                    ref={imgRef}
-                                    placeholder="Hola"
-                                />
+    const isNameAlreadyAdded =
+      men.some((element) => element.name === name) ||
+      women.some((element) => element.name === name);
 
-                                <label htmlFor="gender" className="text-white">
-                                    Género:
-                                </label>
+    if (isNameAlreadyAdded) return alert("Esa persona ya fue añadida");
 
-                                <select
-                                    className="w-full text-lg text-center"
-                                    ref={genderRef}>
-                                    <option value={"Masculino"}>
-                                        Masculino
-                                    </option>
-                                    <option value={"Femenino"}>Femenino</option>
-                                </select>
+    // PROCESS THE DATA
+    const reader: FileReader = new FileReader();
+    reader.readAsDataURL(file);
 
-                                <label
-                                    htmlFor="presentation"
-                                    className="text-whites">
-                                    Presentación:
-                                </label>
-                                <textarea
-                                    ref={presentationRef}
-                                    className="w-full h-24 text-lg mb-2"
-                                    placeholder="Añade una presentación"
-                                    maxLength={PRESENTATION_MAX_LENGTH}
-                                    // onChange={(
-                                    //     evt: React.ChangeEvent<HTMLTextAreaElement>
-                                    // ) => {
+    // This is async so the state updater goes inside the arrow function
+    reader.addEventListener("load", () => {
+      const newUser: IUser = {
+        name: name,
+        img: reader.result as string,
+        gender: genderRef.current?.value === "Masculino" ? "MALE" : "FEMALE",
+        presentation: presentationRef.current?.value as string,
+      };
 
-                                    //     setTypedCharacters(
-                                    //         evt.target.value.length
-                                    //     );
-                                    // }
-                                    // }
-                                ></textarea>
+      if (newUser.gender === "MALE") {
+        setMen((currentValue) => [...currentValue, newUser]);
+      } else {
+        setWomen((currentValue) => [...currentValue, newUser]);
+      }
 
-                                <span className="text-white relative left-[80%] text-lg text-bold">{`${typedCharacters}/${PRESENTATION_MAX_LENGTH}`}</span>
+      setAddingUser(false);
+    });
+  };
 
-                                <div className="h-20 w-full flex justify-around flex-col items-center">
-                                    <button
-                                        className="bg-white text-black rounded-md cursor-pointer duration-300 ease-out h-7 w-1/2 text-lg hover:shadow-white shadow-sm"
-                                        type="submit"
-                                        onClick={(evt) => {
-                                            evt.preventDefault();
-                                            // setTypedCharacters(0);
-                                            addPerson();
-                                        }}>
-                                        Añadir persona
-                                    </button>
+  return (
+    <>
+      <div
+        onClick={onClickHandle}
+        className="z-10 flex justify-center items-center align-text-top text-white text-lg w-20 h-20 rounded-full shadow-white/50 shadow-lg bg-gradient-to-br from-primary to-secondary color-white fixed bottom-4 right-4 hover:scale-110 hover:shadow-white cursor-pointer ease-out duration-300"
+      >
+        <p>
+          <i>Add user</i>
+        </p>
+      </div>
 
-                                    <button
-                                        className="bg-white text-black rounded-md cursor-pointer duration-300 ease-out h-7 w-1/2 text-lg hover:shadow-white shadow-sm"
-                                        onClick={() => {
-                                            onClickHandle();
-                                            // setTypedCharacters(0);
-                                        }}>
-                                        Volver
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-        </>
-    );
+      {isAddingUser && (
+        <div className={styles.Modal}>
+          {/* Capa de opacidad */}
+          <div className={styles.ModalOpacityLayer}></div>
+          {/* CONTENT */}
+          <div
+            // style={{ minWidth: "calc(100vw - 70%)" }}
+            className={styles.ModalContent}
+          >
+            <form className={styles.form}>
+              <div className={styles.divLabelInput}>
+                <label htmlFor="name" className={styles.label}>
+                  Nombre:
+                </label>
+
+                <input
+                  type="text"
+                  ref={nameRef}
+                  id="name"
+                  placeholder="Nombre de la persona"
+                  maxLength={30}
+                  className="w-full shadow-sm shadow-gray-300 outline-none rounded-sm"
+                />
+              </div>
+
+              <div className={styles.divLabelInput}>
+                <label htmlFor="user-img" className={styles.label}>
+                  Imágen:
+                </label>
+                <input
+                  type="file"
+                  ref={imgRef}
+                  id="user-img"
+                  placeholder="Hola"
+                  className="w-full text-white rounded-sm"
+                />
+              </div>
+
+              <div className={styles.divLabelInput}>
+                <label htmlFor="gender" className={styles.label}>
+                  Género:
+                </label>
+
+                <select
+                  className="w-full text-lg text-center shadow-sm shadow-gray-300 outline-none rounded-sm"
+                  ref={genderRef}
+                  id="gender"
+                >
+                  <option value={"Masculino"}>Masculino</option>
+                  <option value={"Femenino"}>Femenino</option>
+                </select>
+              </div>
+
+              <div className={styles.divLabelInput}>
+                <label htmlFor="presentation" className={styles.label}>
+                  Presentación:
+                </label>
+                <textarea
+                  ref={presentationRef}
+                  className="w-full h-24 text-lg mb-2 shadow-sm shadow-gray-300 outline-none rounded-sm"
+                  placeholder="Añade una presentación"
+                  maxLength={PRESENTATION_MAX_LENGTH}
+                  onChange={(evt) => {
+                    setTypedCharacters(evt.target.value.length);
+                  }}
+                ></textarea>
+              </div>
+
+              <span
+                className={styles.span}
+              >{`${typedCharacters}/${PRESENTATION_MAX_LENGTH}`}</span>
+
+              <div className={styles.divButtons}>
+                <button
+                  className={styles.button}
+                  type="submit"
+                  onClick={(evt) => {
+                    evt.preventDefault();
+                    // setTypedCharacters(0);
+                    addPerson();
+                  }}
+                >
+                  Añadir persona
+                </button>
+
+                <button
+                  className={styles.button}
+                  onClick={() => {
+                    onClickHandle();
+                    // setTypedCharacters(0);
+                  }}
+                >
+                  Volver
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default ButtonAddUser;

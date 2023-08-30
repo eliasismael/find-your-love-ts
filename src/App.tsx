@@ -1,40 +1,39 @@
-import { useRoutes, BrowserRouter } from "react-router-dom";
+import { useRef } from "react";
 
 import Layout from "./components/Layout/Layout";
 import Navbar from "./components/Navbar/Navbar";
-
-// Context
+import Footer from "./components/Footer/Footer";
 
 import AboutUs from "./pages/AboutUs/AboutUs";
 import Contact from "./pages/Contact/Contact";
 import Home from "./pages/Home/Home";
 
+// Context
 import { UsersContextProvider } from "./context/users";
 import { CouplesContextProvider } from "./context/couples";
 
+import { ISectionRefs } from "./models/pageSections";
+
 function App() {
-    const AppRoutes = () => {
-        const routes = useRoutes([
-            { path: "/", element: <Home /> },
-            { path: "/about-us", element: <AboutUs /> },
-            { path: "/contact", element: <Contact /> },
-        ]);
+  const refs: ISectionRefs = {
+    contactRef: useRef<HTMLDivElement | null>(null),
+    aboutUsRef: useRef<HTMLDivElement | null>(null),
+    appRef: useRef<HTMLDivElement | null>(null),
+  };
 
-        return routes;
-    };
-
-    return (
-        <UsersContextProvider>
-            <CouplesContextProvider>
-                <BrowserRouter>
-                    <Layout>
-                        <Navbar />
-                        <AppRoutes />
-                    </Layout>
-                </BrowserRouter>
-            </CouplesContextProvider>
-        </UsersContextProvider>
-    );
+  return (
+    <UsersContextProvider>
+      <CouplesContextProvider>
+        <Layout>
+          <Navbar refs={refs} />
+          <Home ref={refs.appRef} />
+          <AboutUs ref={refs.aboutUsRef} />
+          <Contact ref={refs.contactRef} />
+          <Footer />
+        </Layout>
+      </CouplesContextProvider>
+    </UsersContextProvider>
+  );
 }
 
 export default App;
